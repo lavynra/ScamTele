@@ -60,6 +60,7 @@ KUALITAS_KOMPRESI_JPEG: int = 85
 DIREKTORI_DASAR: Path = Path(__file__).resolve().parent
 PATH_DATABASE: Path = DIREKTORI_DASAR / "database.db"
 PATH_FOTO_SAMBUTAN: Path = DIREKTORI_DASAR / "assets" / "welcome.jpg"
+PATH_QRIS: Path = DIREKTORI_DASAR / "assets" / "qris.jpg"
 
 # ======================================================================
 # DAFTAR BANK & E-WALLET YANG DIKENALI BOT
@@ -71,8 +72,15 @@ DAFTAR_EWALLET: list[str] = ["DANA", "OVO", "GOPAY", "SHOPEEPAY", "LINKAJA"]
 
 DAFTAR_BANK: list[str] = [
     "BCA", "BRI", "MANDIRI", "BNI", "BSI",
-    "SEABANK", "CIMB", "PERMATA", "DANAMON", "BTN", "SUPERBANK", "BANKJAGO", "NEOBANK", "ALLOBANK", "PANIN", "USDT", "USDC", "BTC", "ETH", "SOL",
+    "SEABANK", "CIMB", "PERMATA", "DANAMON", "BTN", "SUPERBANK", "BANKJAGO", "NEOBANK", "ALLOBANK", "PANIN",
 ]
+
+# Kode koin kripto DIPISAH dari DAFTAR_BANK (bukan digabung) karena alamat
+# wallet kripto memakai kombinasi huruf, angka, bahkan simbol -- berbeda
+# dari nomor rekening bank yang selalu berupa digit. Jika digabung ke
+# DAFTAR_BANK, deteksi_jenis_data() di database.py akan menyaring alamat
+# kripto memakai aturan "hanya digit" milik bank sehingga hurufnya hilang.
+DAFTAR_CRYPTO: list[str] = ["USDT", "USDC", "BTC", "ETH", "SOL"]
 
 # ======================================================================
 # PENGATURAN UMUM

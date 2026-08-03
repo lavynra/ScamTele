@@ -153,6 +153,21 @@ def normalisasi_nomor_hp(nomor: str) -> str:
     return bersih
 
 
+def _ekstrak_alamat_crypto(mentah: str, nama_crypto: str) -> str:
+    """
+    Mengambil alamat wallet crypto apa adanya dari teks laporan/pencarian.
+
+    Alamat crypto (BTC, ETH, USDT, dst) memakai kombinasi huruf, angka,
+    bahkan simbol -- BUKAN deretan digit seperti nomor rekening bank.
+    Karena itu fungsi ini TIDAK boleh memakai penyaringan "hanya digit".
+    Yang dibuang hanya nama/kode koinnya (mis. "BTC") beserta pemisah di
+    sekitarnya (spasi/strip/titik dua); sisa teks dikembalikan utuh.
+    """
+    tanpa_nama_koin = re.sub(re.escape(nama_crypto), "", mentah, count=1, flags=re.IGNORECASE)
+    alamat = tanpa_nama_koin.strip(" \t-:")
+    return alamat if alamat else mentah
+
+
 def deteksi_jenis_data(teks: str) -> tuple[str, str]:
     """
     Mendeteksi jenis data yang dikirim pengguna (untuk pencarian & pelaporan).
@@ -161,6 +176,7 @@ def deteksi_jenis_data(teks: str) -> tuple[str, str]:
     - ("username", "namaakun")   -> username Telegram / nama scammer
     - ("telepon", "0812xxxxxxx") -> nomor HP (juga dipakai e-wallet umumnya)
     - ("DANA"/"OVO"/..., nomor)  -> e-wallet dengan nama diketahui
+    - ("BTC"/"USDT"/..., alamat) -> alamat wallet crypto dengan kode diketahui
     - ("BCA"/"BRI"/..., nomor)   -> bank dengan nama diketahui
     - ("rekening", "1234567890") -> deretan angka tanpa nama bank/ewallet
     """
@@ -183,6 +199,10 @@ def deteksi_jenis_data(teks: str) -> tuple[str, str]:
         if nama_ewallet in kata_kunci:
             nilai = normalisasi_nomor_hp(digit_dalam_teks) if digit_dalam_teks else ""
             return nama_ewallet, nilai
+
+    for nama_crypto in config.DAFTAR_CRYPTO:
+        if nama_crypto in kata_kunci:
+            return nama_crypto, _ekstrak_alamat_crypto(mentah, nama_crypto)
 
     for nama_bank in config.DAFTAR_BANK:
         if nama_bank in kata_kunci:

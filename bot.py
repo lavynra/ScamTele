@@ -108,6 +108,43 @@ async def mulai(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await kirim_sambutan(update.effective_chat.id, context, bhs, pengguna.first_name or "")
 
 
+async def donate(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    caption = """
+Support the Bot | Dukung Bot
+
+Terima kasih telah menggunakan bot ini. Jika bot ini membantu Anda, pertimbangkan untuk memberikan donasi sebagai bentuk dukungan. Setiap donasi akan digunakan untuk membantu biaya VPS agar bot tetap online, stabil, dan terus dikembangkan.
+
+Thank you for using this bot. If you find it helpful, please consider supporting its development with a donation. Every contribution helps cover VPS costs, keeping the bot online, reliable, and continuously improving.
+
+━━━━━━━━━━━━━━
+
+*USDT TRC20 (tron)*
+`TC4RgyQ2qKLd3VQA993Bm7gmJbSAhbxmC5`
+
+*USDC (ArbitrumOne)*
+`0x4a9d9f4ce148d752eb4026b459a2c89461c035fd`
+
+*BTC BEP20*
+`0x4a9d9f4ce148d752eb4026b459a2c89461c035fd`
+
+*SOL *
+`7Fbhbqpyx6nRFxYBggg4NTLnM96za4y8b43YRdD61qXG`
+
+*ETH (ArbitrumOne)*
+`0x4a9d9f4ce148d752eb4026b459a2c89461c035fd`
+
+*GRAM / TON (The Open Network)*
+`UQCyYpSgRAmgelxMINbPcOdawcJ4A6sNqW5AizNjoqJLdNtQ`
+"""
+
+    with open(config.PATH_QRIS, "rb") as foto:
+        await update.message.reply_photo(
+            photo=foto,
+            caption=caption,
+            parse_mode="Markdown",
+        )
+
+
 async def pilih_bahasa_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
     await query.answer()
@@ -589,6 +626,7 @@ def _bangun_aplikasi() -> Application:
     aplikasi = Application.builder().token(config.TOKEN_BOT).build()
 
     aplikasi.add_handler(CommandHandler("start", mulai))
+    aplikasi.add_handler(CommandHandler("donate", donate))
     aplikasi.add_handler(CallbackQueryHandler(pilih_bahasa_callback, pattern="^bahasa_(id|en)$"))
 
     percakapan_cari = ConversationHandler(
